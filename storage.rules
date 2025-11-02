@@ -1,0 +1,19 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Media bucket for greeting cards
+    match /media/{allPaths=**} {
+      // Allow public read access to all media
+      allow read: if true;
+      
+      // Allow uploads with size and type validation
+      allow create: if request.resource.size < 10 * 1024 * 1024 && // 10MB max
+                       (request.resource.contentType.matches('image/.*') ||
+                        request.resource.contentType.matches('video/.*') ||
+                        request.resource.contentType.matches('audio/.*'));
+      
+      // Allow deletion of old files (30+ days)
+      allow delete: if request.time > resource.timeCreated + duration.value(30, 'd');
+    }
+  }
+}

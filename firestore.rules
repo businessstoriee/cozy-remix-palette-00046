@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to validate greeting data
+    function isValidGreeting(greeting) {
+      return greeting.keys().hasAll(['id', 'slug', 'eventType', 'senderName', 'receiverName']) &&
+             greeting.senderName is string && greeting.senderName.size() <= 100 &&
+             greeting.receiverName is string && greeting.receiverName.size() <= 100 &&
+             greeting.eventType is string && greeting.eventType.size() <= 50 &&
+             greeting.slug is string && greeting.slug.size() <= 200;
+    }
+
+    // Greetings collection
+    match /greetings/{greetingId} {
+      // Anyone can read public greetings
+      allow read: if resource.data.isPublic == true;
+      
+      // Anyone can create greetings (no authentication required for basic use)
+      allow create: if isValidGreeting(request.resource.data) &&
+                       request.resource.data.createdAt == request.time &&
+                       request.resource.data.updatedAt == request.time;
+      
+      // Anyone can update greetings (for features like incrementing view count)
+      // But prevent modifying critical fields
+      allow update: if isValidGreeting(request.resource.data) &&
+                       request.resource.data.id == resource.data.id &&
+                       request.resource.data.slug == resource.data.slug &&
+                       request.resource.data.createdAt == resource.data.createdAt &&
+                       request.resource.data.updatedAt == request.time;
+      
+      // Greetings older than 30 days can be deleted (cleanup)
+      allow delete: if request.time > resource.data.createdAt + duration.value(30, 'd');
+    }
+  }
+}
