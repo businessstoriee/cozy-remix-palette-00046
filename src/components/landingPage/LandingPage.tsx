@@ -14,6 +14,7 @@ import PublicGreetingsFeed from '@/components/feed/PublicGreetingsFeed';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import AnimatedSidebar from '@/components/navigation/AnimatedSidebar';
 import HamburgerButton from '@/components/navigation/HamburgerButton';
+import BackToTop from '@/components/common/BackToTop';
 import { Edit } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
@@ -479,6 +480,9 @@ return (
 </div>
 
   </div>
+  
+  {/* Back to Top Button */}
+  <BackToTop />
 </div>
   );
 

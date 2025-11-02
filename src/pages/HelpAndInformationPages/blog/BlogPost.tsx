@@ -9,6 +9,7 @@ import SEOManager from '@/components/seo/SEOManager';
 import AnimatedSidebar from '@/components/navigation/AnimatedSidebar';
 import AnimatedBackButton from '@/components/common/AnimatedBackButton';
 import AnimatedShareButton from '@/components/common/AnimatedShareButton';
+import BackToTop from '@/components/common/BackToTop';
 
 const BlogPost: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -238,6 +239,9 @@ const BlogPost: React.FC = () => {
           </motion.article>
         </main>
       </div>
+      
+      {/* Back to Top Button */}
+      <BackToTop />
     </div>
   );
 };
