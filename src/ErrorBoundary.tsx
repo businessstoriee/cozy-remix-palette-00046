@@ -184,75 +184,32 @@ const ErrorUI = ({ error }: { error?: Error }) => {
      
       </motion.div>
 
-      {/* Floating particles */}
-      {[...Array(15)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-purple-500/30 dark:bg-fuchsia-400/30"
-          style={{
-            width: `${Math.random() * 10 + 6}px`,
-            height: `${Math.random() * 10 + 6}px`,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            y: [0, -40, 0],
-            x: [0, Math.random() * 30 - 15, 0],
-            opacity: [0.2, 0.8, 0.2],
-          }}
-          transition={{
-            duration: Math.random() * 10 + 10,
-            repeat: Infinity,
-            repeatType: "reverse",
-            delay: Math.random() * 5,
-          }}
-        />
-      ))}
-
-
-       {/* Floating particles background */}
-    <div className="fixed inset-0 -z-40 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
-        <div 
-          key={i}
-          className="absolute rounded-full bg-primary/10"
-          style={{
-            width: `${Math.random() * 6 + 2}px`,
-            height: `${Math.random() * 6 + 2}px`,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `float ${Math.random() * 20 + 10}s linear infinite`,
-            animationDelay: `${Math.random() * 5}s`
-          }}
-        />
-      ))}
-    {/* </div> */}
-
-    
-
-    {/* 🌟 Floating Glowing Particles */}
-{/* <div className="fixed inset-0 -z-30 overflow-hidden pointer-events-none"> */}
-  {[...Array(25)].map((_, i) => (
-    <div
-      key={i}
-      className="absolute rounded-full blur-xl opacity-60 animate-float-slow"
-      style={{
-        width: `${Math.random() * 12 + 8}px`,
-        height: `${Math.random() * 12 + 8}px`,
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        background: [
-          "rgba(244,114,182,0.6)", // pink
-          "rgba(192,132,252,0.6)", // purple
-          "rgba(99,102,241,0.6)",  // indigo
-          "rgba(56,189,248,0.6)",  // cyan
-        ][Math.floor(Math.random() * 4)],
-        animationDelay: `${Math.random() * 10}s`,
-        animationDuration: `${20 + Math.random() * 20}s`,
-      }}
-    />
-  ))}
-</div>
+      {/* Floating particles background - Single container for all particles */}
+      <div className="fixed inset-0 -z-40 overflow-hidden pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={`particle-${i}`}
+            className="absolute rounded-full bg-purple-500/30 dark:bg-fuchsia-400/30"
+            style={{
+              width: `${Math.random() * 10 + 6}px`,
+              height: `${Math.random() * 10 + 6}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -40, 0],
+              x: [0, Math.random() * 30 - 15, 0],
+              opacity: [0.2, 0.8, 0.2],
+            }}
+            transition={{
+              duration: Math.random() * 10 + 10,
+              repeat: Infinity,
+              repeatType: "reverse",
+              delay: Math.random() * 5,
+            }}
+          />
+        ))}
+      </div>
     </motion.div>
   );
 };

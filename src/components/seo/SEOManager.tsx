@@ -74,6 +74,11 @@ const SEOManager = ({
     const mediaItems = greetingData?.media || [];
     const allImages = mediaItems.filter(m => m.type === 'image').map(m => m.url);
     
+    // Generate dynamic OG image URL (use first image or create a default)
+    const dynamicOGImage = firstImage || `${window.location.origin}/og-default.png`;
+    seoData.ogImage = dynamicOGImage;
+    seoData.twitterImage = dynamicOGImage;
+    
     seoData.structuredData = {
       "@context": "https://schema.org",
       "@graph": [

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { faqs } from './FAQData';
 import AnimatedSidebar from '@/components/navigation/AnimatedSidebar';
 import Footer from '../Footer';
 import ReusableHeader from '@/pages/HelpAndInformationPages/ReusableHeader';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 
 const FAQ = ({ onClick }: { onClick?: () => void }) => {
@@ -18,11 +19,12 @@ const FAQ = ({ onClick }: { onClick?: () => void }) => {
       const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10 ">
-      <SEOManager
-        title="FAQ - Frequently Asked Questions"
-        description="Find answers to common questions about creating and sharing beautiful greeting cards. Learn how to use all features effectively."
-      />
+    <Suspense fallback={<LoadingSpinner message="Loading FAQs..." />}>
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10 ">
+        <SEOManager
+          title="FAQ - Frequently Asked Questions"
+          description="Find answers to common questions about creating and sharing beautiful greeting cards. Learn how to use all features effectively."
+        />
 
       <ReusableHeader title="FAQs" onMenuClick={() => setSidebarOpen(true)} />
       <AnimatedSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -164,9 +166,10 @@ const FAQ = ({ onClick }: { onClick?: () => void }) => {
         </motion.div>
       </div>
 
-      {/* Use the Footer component */}
-      <Footer showSocialLinks={true} simple className="mt-6" />
-    </div>
+        {/* Use the Footer component */}
+        <Footer showSocialLinks={true} simple className="mt-6" />
+      </div>
+    </Suspense>
   );
 };
 

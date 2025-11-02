@@ -5,7 +5,7 @@ import { ArrowLeft, Clock, Calendar, Tag, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { blogPosts } from './BlogData';
-import SEOManager from '@/components/seo/SEOManager';
+import BlogPostSEO from '@/components/seo/BlogPostSEO';
 import AnimatedSidebar from '@/components/navigation/AnimatedSidebar';
 import AnimatedBackButton from '@/components/common/AnimatedBackButton';
 import AnimatedShareButton from '@/components/common/AnimatedShareButton';
@@ -55,11 +55,15 @@ const BlogPost: React.FC = () => {
   };
 
   return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
-
-      <SEOManager
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
+      <BlogPostSEO
         title={post.title}
         description={post.excerpt}
+        date={post.date}
+        readTime={post.readTime}
+        category={post.category}
+        image={typeof post.image === 'string' ? post.image : undefined}
+        postId={post.id}
       />
       
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">

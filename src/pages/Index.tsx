@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { GreetingFormData, EventType } from '@/types/greeting';
 import { eventTypes } from '@/types/eventTypes';
-import { animationOptions } from '@/types/animations'; // ✅ Use consolidated animations
+import { animationOptions } from '@/types/animations';
 import ShareActions from '@/components/share/ShareActions';
 import SEOManager from '@/components/seo/SEOManager';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +15,7 @@ import Preview from '@/components/preview/Preview';
 import { useFirebaseGreetings } from '@/hooks/useFirebaseGreetings';
 import PWAInstallPrompt from '@/components/pwa/PWAInstallPrompt';
 import OnboardingTutorial from '@/components/onboarding/OnboardingTutorial';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const Index = () => {
   const location = useLocation();
@@ -117,11 +118,11 @@ if (greetingData && (greetingData.eventType || greetingData.customEventName)) {
 
   // Show landing page if no greeting data
   return (
-    <>
+    <Suspense fallback={<LoadingSpinner message="Loading..." />}>
       <LandingPage />
       <PWAInstallPrompt />
       <OnboardingTutorial />
-    </>
+    </Suspense>
   );
 };
 

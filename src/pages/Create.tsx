@@ -1,5 +1,5 @@
 // src/pages/create/Create.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import { useCreate } from "./create/useCreate";
 import BackButton from "@/components/ui/back-button";
@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import FirebaseShareButton from '@/components/share/GenerateShareLink';
 import HamburgerButton from '@/components/navigation/HamburgerButton';
 import AnimatedSidebar from '@/components/navigation/AnimatedSidebar';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 
 const CreatePage: React.FC = ({ onClick }: { onClick?: () => void }) => {
@@ -43,9 +44,11 @@ const CreatePage: React.FC = ({ onClick }: { onClick?: () => void }) => {
   const [searchParams] = useSearchParams();
   const { loadGreeting } = useFirebaseGreetings();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isLoadingGreeting, setIsLoadingGreeting] = useState(false);
 
   // Handle editing existing greeting or loading template
   useEffect(() => {
+    setIsLoadingGreeting(true);
     const editSlug = searchParams.get('edit');
     if (editSlug) {
       // Load existing greeting data
@@ -66,7 +69,12 @@ const CreatePage: React.FC = ({ onClick }: { onClick?: () => void }) => {
       console.log('Loading greeting from navigation state:', location.state.greetingData);
       setFormData(location.state.greetingData);
     }
+    setIsLoadingGreeting(false);
   }, [searchParams, location.state, loadGreeting, setFormData]);
+
+  if (isLoadingGreeting) {
+    return <LoadingSpinner message="Loading greeting..." />;
+  }
 
   return (
     <div className="bg-gradient-to-br from-primary/10 via-background to-secondary/20 ">
