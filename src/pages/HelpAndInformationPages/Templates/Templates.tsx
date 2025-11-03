@@ -1,22 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Cake, Heart, GraduationCap, PartyPopper, Gift } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import SEOManager from '@/components/seo/SEOManager';
 import AnimatedSidebar from '@/components/navigation/AnimatedSidebar';
 import { templates, Template } from './TemplatesData';
 import Footer from '../Footer';
 import ReusableHeader from '@/pages/HelpAndInformationPages/ReusableHeader';
+import TemplateSearchBar, { TemplateFilters } from '@/components/templates/TemplateSearchBar';
+import BackToTop from '@/components/common/BackToTop';
 
 
 const Templates = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [filters, setFilters] = useState<TemplateFilters>({
+    searchQuery: '',
+    category: 'all',
+    sortBy: 'name',
+  });
+
+  // Extract unique categories
+  const categories = useMemo(() => {
+    const cats = templates.map(t => t.eventType);
+    return Array.from(new Set(cats));
+  }, []);
+
+  // Filter and sort templates
+  const filteredTemplates = useMemo(() => {
+    let result = [...templates];
+
+    // Apply search filter
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      result = result.filter(
+        (t) =>
+          t.name.toLowerCase().includes(query) ||
+          t.description.toLowerCase().includes(query) ||
+          t.eventType.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply category filter
+    if (filters.category !== 'all') {
+      result = result.filter((t) => t.eventType === filters.category);
+    }
+
+    // Apply sorting
+    switch (filters.sortBy) {
+      case 'name':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'popular':
+        // Mock popularity - in real app this would come from analytics
+        result.sort(() => Math.random() - 0.5);
+        break;
+      case 'newest':
+        result.reverse();
+        break;
+    }
+
+    return result;
+  }, [filters]);
 
   const handleTemplateSelect = (template: Template) => {
-    // Navigate to create page with template data
     navigate('/create', { state: { templateData: template.defaultData } });
   };
 
@@ -45,12 +94,44 @@ const Templates = () => {
               Choose from our beautiful pre-designed templates and customize them to make them uniquely yours
             </p>
           </motion.div>
+
+          {/* Search & Filter Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="max-w-4xl mx-auto"
+          >
+            <TemplateSearchBar
+              onFiltersChange={setFilters}
+              resultsCount={filteredTemplates.length}
+              categories={categories}
+            />
+          </motion.div>
         </section>
 
         {/* Templates Grid */}
         <section className="container mx-auto px-4 pb-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {templates.map((template, index) => (
+          {filteredTemplates.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-20"
+            >
+              <p className="text-2xl text-muted-foreground mb-4">No templates found</p>
+              <p className="text-muted-foreground mb-6">
+                Try adjusting your search or filters
+              </p>
+              <Button
+                onClick={() => setFilters({ searchQuery: '', category: 'all', sortBy: 'name' })}
+                variant="outline"
+              >
+                Clear Filters
+              </Button>
+            </motion.div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredTemplates.map((template, index) => (
               <motion.div
                 key={template.id}
                 initial={{ opacity: 0, y: 30 }}
@@ -105,8 +186,9 @@ const Templates = () => {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* CTA Section */}
@@ -133,6 +215,9 @@ const Templates = () => {
 
       {/* Use the Footer component */}
       <Footer showSocialLinks={true} simple className="mt-6" />
+      
+      {/* Back to Top Button */}
+      <BackToTop />
     </div>
   );
 };

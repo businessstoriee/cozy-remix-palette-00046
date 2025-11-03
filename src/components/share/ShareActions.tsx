@@ -134,12 +134,11 @@ const ShareActions = ({ greetingData, selectedEvent, onlyShareButton, dialogOpen
   const shareToSocialMedia = (platform: string) => {
     const shareableURL = generateShareableURL();
     const eventType = currentGreetingData?.eventType || 'default';
-    
-    // Get catchy share message with emojis and formatting
     const catchyMessage = generateShareMessage(eventType, shareableURL);
-    
-    // For platforms that don't support rich text, use plain version
     const plainText = catchyMessage.replace(/\*\*/g, '').replace(/\*/g, '');
+    
+    // Get first media URL for rich sharing
+    const mediaUrl = currentGreetingData?.media?.[0]?.url || '';
     
     let shareURL = '';
 
@@ -148,7 +147,7 @@ const ShareActions = ({ greetingData, selectedEvent, onlyShareButton, dialogOpen
         shareURL = `https://wa.me/?text=${encodeURIComponent(catchyMessage)}`; 
         break;
       case 'facebook': 
-        // Facebook doesn't allow pre-filled text, just URL
+        // Facebook scrapes OG tags from the URL
         shareURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareableURL)}`; 
         break;
       case 'twitter': 

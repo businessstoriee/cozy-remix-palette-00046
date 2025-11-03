@@ -8,20 +8,21 @@ import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 
 interface URLCustomizerProps {
-  currentSlug: string;
-  onCustomize?: (customUrl: string) => void;
+  currentSlug?: string;
+  onCustomize: (customUrl: string) => void;
   senderName?: string;
   receiverName?: string;
   eventName?: string;
+  initialURL?: string;
 }
 
 const URLCustomizer = ({ 
-  currentSlug, 
+  currentSlug,
   onCustomize,
   senderName = "someone",
-  receiverName = "You",
+  receiverName = "you",
   eventName = "greeting",
-
+  initialURL,
 }: URLCustomizerProps) => {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
  
@@ -29,35 +30,41 @@ const URLCustomizer = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const { toast } = useToast();
- const [isCopied, setIsCopied] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
+  // Generate default URL from form data
+  const generateDefaultUrl = () => {
+    return `${senderName || 'someone'}-wishes-${eventName || 'greeting'}-${receiverName || 'you'}`
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
 
- // Create dynamic placeholder with better fallbacks
-const placeholderUrl = `${senderName || 'someone'}-'wishes'-${eventName || 'greeting'}-${receiverName || 'you'}`
-  .toLowerCase()
-  .replace(/[^a-z0-9-]/g, '-')
-  .replace(/-+/g, '-')
-  .replace(/^-|-$/g, '');
-    
-    console.log('Props received:', { senderName, receiverName, eventName });
-    console.log (placeholderUrl)
+  const [customUrl, setCustomUrl] = useState(() => {
+    const saved = sessionStorage.getItem('url-customizer-value');
+    const isCustomized = sessionStorage.getItem('url-customizer-enabled') === 'true';
+    return saved && isCustomized ? saved : initialURL || generateDefaultUrl();
+  });
 
-    const [customUrl, setCustomUrl] = useState(() => {
-      // Persist state in sessionStorage to survive tab switches
-      const saved = sessionStorage.getItem('url-customizer-value');
-      return saved || placeholderUrl;
-    });
-  
+  // Auto-update URL when form data changes (only if not manually customized)
   useEffect(() => {
-    sessionStorage.setItem('url-customizer-value', customUrl);
-  }, [customUrl]);
-
-  // Update when currentSlug changes (new greeting)
-  useEffect(() => {
-    if (placeholderUrl && placeholderUrl !== customUrl) {
-      setCustomUrl(placeholderUrl);
+    const isCustomized = sessionStorage.getItem('url-customizer-enabled') === 'true';
+    if (!isCustomized) {
+      const newUrl = generateDefaultUrl();
+      setCustomUrl(newUrl);
+      // Automatically notify parent of default URL
+      onCustomize(newUrl);
     }
-  }, [placeholderUrl]);
+  }, [senderName, receiverName, eventName]);
+
+  // Persist to session storage
+  useEffect(() => {
+    if (enabled) {
+      sessionStorage.setItem('url-customizer-value', customUrl);
+      sessionStorage.setItem('url-customizer-enabled', 'true');
+    }
+  }, [customUrl, enabled]);
 
 
   const handleCustomize = () => {
@@ -80,12 +87,14 @@ const placeholderUrl = `${senderName || 'someone'}-'wishes'-${eventName || 'gree
       return;
     }
 
-    onCustomize?.(customUrl);
+    // Mark as customized and save
+    sessionStorage.setItem('url-customizer-enabled', 'true');
+    onCustomize(customUrl);
     setIsEditing(false);
     
     toast({
       title: "URL Customized!",
-      description: "Your custom URL has been set successfully",
+      description: "Your custom URL will be used when sharing",
     });
   };
 
@@ -104,23 +113,29 @@ const placeholderUrl = `${senderName || 'someone'}-'wishes'-${eventName || 'gree
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Convert to lowercase and remove invalid characters
     const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
     setCustomUrl(value);
-    setIsEditing(value !== currentSlug);
+    setIsEditing(true);
   };
 
   const handleToggleEnabled = (checked: boolean) => {
     setEnabled(checked);
-    // Auto-expand when enabled
     if (checked) {
       setIsExpanded(true);
+      sessionStorage.setItem('url-customizer-enabled', 'true');
+      // Notify parent with current URL
+      onCustomize(customUrl);
+    } else {
+      sessionStorage.removeItem('url-customizer-enabled');
+      sessionStorage.removeItem('url-customizer-value');
+      // Reset to default
+      const defaultUrl = generateDefaultUrl();
+      setCustomUrl(defaultUrl);
+      onCustomize(defaultUrl);
     }
   };
 
-  // Use placeholder as suggestion when input is empty
-  const displayValue = customUrl || '';
-  const showPlaceholderSuggestion = !customUrl;
+  const displayValue = customUrl || generateDefaultUrl();
 
   return (
     <Card className="border border-purple-500 shadow-lg hover:shadow-xl bg-gradient-to-br from-white to-gray-50/50 dark:from-slate-900 dark:to-slate-800 dark:border-slate-700 dark:shadow-slate-900/50 overflow-hidden">
@@ -191,8 +206,9 @@ const placeholderUrl = `${senderName || 'someone'}-'wishes'-${eventName || 'gree
                       <Input
                         value={displayValue}
                         onChange={handleInputChange}
-                        placeholder={placeholderUrl}
+                        placeholder={generateDefaultUrl()}
                         className="w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent text-sm font-medium text-foreground pr-10 placeholder:text-muted-foreground/70"
+                        disabled={!enabled}
                       />
                       
                       {/* Copy Button */}
@@ -256,7 +272,7 @@ const placeholderUrl = `${senderName || 'someone'}-'wishes'-${eventName || 'gree
                 >
                   <p className="text-xs text-muted-foreground mb-1">Preview:</p>
                   <p className="text-sm font-mono text-foreground/80 break-all">
-                    {baseUrl}/{customUrl || placeholderUrl}
+                    {baseUrl}/{displayValue}
                   </p>
                 </motion.div>
               )}
