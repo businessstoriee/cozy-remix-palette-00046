@@ -1,5 +1,6 @@
 import { eventTypes } from '@/types/eventTypes';
 import { blogPosts } from '@/pages/HelpAndInformationPages/blog/BlogData';
+import { getAllEvents } from '@/services/calendarAPI';
 
 export interface SitemapURL {
   loc: string;
@@ -11,7 +12,7 @@ export interface SitemapURL {
 /**
  * Generate sitemap URLs for the application
  */
-export const generateSitemapURLs = (): SitemapURL[] => {
+export const generateSitemapURLs = async (): Promise<SitemapURL[]> => {
   const baseUrl = window.location.origin;
   const today = new Date().toISOString().split('T')[0];
 
@@ -94,14 +95,29 @@ export const generateSitemapURLs = (): SitemapURL[] => {
     });
   });
 
+  // Add calendar events dynamically
+  try {
+    const events = await getAllEvents();
+    events.forEach(event => {
+      urls.push({
+        loc: `${baseUrl}/event/${event.id}`,
+        lastmod: today,
+        changefreq: 'daily',
+        priority: 0.6
+      });
+    });
+  } catch (error) {
+    console.warn('Failed to load calendar events for sitemap:', error);
+  }
+
   return urls;
 };
 
 /**
  * Generate XML sitemap string
  */
-export const generateXMLSitemap = (): string => {
-  const urls = generateSitemapURLs();
+export const generateXMLSitemap = async (): Promise<string> => {
+  const urls = await generateSitemapURLs();
   
   const urlEntries = urls
     .map(
@@ -123,8 +139,8 @@ ${urlEntries}
 /**
  * Download sitemap as XML file
  */
-export const downloadSitemap = () => {
-  const xmlContent = generateXMLSitemap();
+export const downloadSitemap = async () => {
+  const xmlContent = await generateXMLSitemap();
   const blob = new Blob([xmlContent], { type: 'application/xml' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

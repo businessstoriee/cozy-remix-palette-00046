@@ -1,547 +1,345 @@
+/**
+ * Enhanced SEO utilities for better search engine optimization
+ */
+
+export interface StructuredDataConfig {
+  type: 'Article' | 'WebPage' | 'Organization' | 'Event' | 'CreativeWork' | 'Product';
+  data: Record<string, any>;
+}
+
 export interface AdvancedSEOData {
   title: string;
   description: string;
   keywords: string[];
-  ogTitle: string;
-  ogDescription: string;
+  ogTitle?: string;
+  ogDescription?: string;
   ogImage?: string;
   ogImageAlt?: string;
   ogType?: string;
   twitterCard?: string;
   twitterImage?: string;
   canonical?: string;
-  lang: string;
+  lang?: string;
+  robots?: string;
   structuredData?: any;
   hrefLang?: Record<string, string>;
-  robots?: string;
 }
 
-// Comprehensive SEO data for all languages and countries
-export const languageSEOMap: Record<string, Record<string, AdvancedSEOData>> = {
-  // English variants
-  birthday: {
-    en: {
-      title: 'Beautiful Birthday Greeting Cards | Create & Share Free Online',
-      description: 'Create stunning personalized birthday greeting cards with animations, music, and custom messages. Share beautiful birthday wishes with friends and family worldwide.',
-      keywords: ['birthday cards', 'birthday greetings', 'personalized cards', 'free birthday cards', 'online greeting cards', 'birthday wishes', 'custom birthday cards'],
-      ogTitle: 'Beautiful Birthday Greeting Cards - Free & Personalized',
-      ogDescription: 'Create and share stunning birthday greeting cards with custom animations, music, and messages.',
-      lang: 'en',
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Birthday Greeting Cards",
-        "description": "Create beautiful birthday greeting cards online",
-        "url": window.location.origin,
-        "applicationCategory": "Entertainment",
-        "operatingSystem": "Web Browser"
-      }
-    },
-    'en-US': {
-      title: 'Beautiful Birthday Greeting Cards | Create & Share Free - USA',
-      description: 'Create stunning personalized birthday greeting cards with animations, music, and custom messages. Share beautiful birthday wishes across America.',
-      keywords: ['birthday cards USA', 'American birthday greetings', 'personalized cards', 'free birthday cards'],
-      ogTitle: 'Beautiful Birthday Greeting Cards - Free & Personalized in USA',
-      ogDescription: 'Create and share stunning birthday greeting cards with custom animations, music, and messages across America.',
-      lang: 'en-US'
-    },
-    'en-GB': {
-      title: 'Beautiful Birthday Greeting Cards | Create & Share Free - UK',
-      description: 'Create stunning personalised birthday greeting cards with animations, music, and custom messages. Share beautiful birthday wishes across Britain.',
-      keywords: ['birthday cards UK', 'British birthday greetings', 'personalised cards', 'free birthday cards'],
-      ogTitle: 'Beautiful Birthday Greeting Cards - Free & Personalised in UK',
-      ogDescription: 'Create and share stunning birthday greeting cards with custom animations, music, and messages across Britain.',
-      lang: 'en-GB'
-    }
-  },
-
-  // Hindi (India)
-  birthday_hi: {
-    hi: {
-      title: 'सुंदर जन्मदिन की शुभकामना कार्ड | मुफ्त ऑनलाइन बनाएं और साझा करें',
-      description: 'एनीमेशन, संगीत और कस्टम संदेशों के साथ शानदार व्यक्तिगत जन्मदिन ग्रीटिंग कार्ड बनाएं। दोस्तों और परिवार के साथ सुंदर जन्मदिन की शुभकामनाएं साझा करें।',
-      keywords: ['जन्मदिन कार्ड', 'जन्मदिन की शुभकामनाएं', 'व्यक्तिगत कार्ड', 'मुफ्त जन्मदिन कार्ड', 'ऑनलाइन ग्रीटिंग कार्ड'],
-      ogTitle: 'सुंदर जन्मदिन ग्रीटिंग कार्ड - मुफ्त और व्यक्तिगत',
-      ogDescription: 'कस्टम एनीमेशन, संगीत और संदेशों के साथ शानदार जन्मदिन ग्रीटिंग कार्ड बनाएं और साझा करें।',
-      lang: 'hi',
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "जन्मदिन ग्रीटिंग कार्ड",
-        "description": "ऑनलाइन सुंदर जन्मदिन ग्रीटिंग कार्ड बनाएं",
-        "url": window.location.origin,
-        "applicationCategory": "मनोरंजन",
-        "operatingSystem": "वेब ब्राउज़र",
-        "inLanguage": "hi"
-      }
-    }
-  },
-
-  // Spanish
-  birthday_es: {
-    es: {
-      title: 'Hermosas Tarjetas de Felicitación de Cumpleaños | Crear y Compartir Gratis',
-      description: 'Crea tarjetas de felicitación de cumpleaños personalizadas con animaciones, música y mensajes personalizados. Comparte hermosos deseos de cumpleaños.',
-      keywords: ['tarjetas de cumpleaños', 'felicitaciones de cumpleaños', 'tarjetas personalizadas', 'tarjetas gratis'],
-      ogTitle: 'Hermosas Tarjetas de Cumpleaños - Gratis y Personalizadas',
-      ogDescription: 'Crea y comparte hermosas tarjetas de felicitación de cumpleaños con animaciones, música y mensajes personalizados.',
-      lang: 'es'
-    }
-  },
-
-  // French
-  birthday_fr: {
-    fr: {
-      title: 'Belles Cartes d\'Anniversaire | Créer et Partager Gratuitement',
-      description: 'Créez de superbes cartes de vœux d\'anniversaire personnalisées avec des animations, de la musique et des messages personnalisés.',
-      keywords: ['cartes d\'anniversaire', 'vœux d\'anniversaire', 'cartes personnalisées', 'cartes gratuites'],
-      ogTitle: 'Belles Cartes d\'Anniversaire - Gratuites et Personnalisées',
-      ogDescription: 'Créez et partagez de superbes cartes de vœux d\'anniversaire avec des animations, de la musique et des messages personnalisés.',
-      lang: 'fr'
-    }
-  },
-
-  // German
-  birthday_de: {
-    de: {
-      title: 'Schöne Geburtstagskarten | Kostenlos Erstellen und Teilen',
-      description: 'Erstellen Sie wunderschöne personalisierte Geburtstagskarten mit Animationen, Musik und benutzerdefinierten Nachrichten.',
-      keywords: ['Geburtstagskarten', 'Geburtstagsgrüße', 'personalisierte Karten', 'kostenlose Karten'],
-      ogTitle: 'Schöne Geburtstagskarten - Kostenlos und Personalisiert',
-      ogDescription: 'Erstellen und teilen Sie wunderschöne Geburtstagskarten mit Animationen, Musik und benutzerdefinierten Nachrichten.',
-      lang: 'de'
-    }
-  },
-
-  // Diwali - Hindi
-  diwali_hi: {
-    hi: {
-      title: 'दिवाली ग्रीटिंग कार्ड | रोशनी के त्योहार की शुभकामनाएं',
-      description: 'पारंपरिक डिजाइन, एनीमेशन और व्यक्तिगत संदेशों के साथ सुंदर दिवाली ग्रीटिंग कार्ड बनाएं। रोशनी के त्योहार की खुशी साझा करें।',
-      keywords: ['दिवाली कार्ड', 'दिवाली की शुभकामनाएं', 'रोशनी का त्योहार', 'हिंदू त्योहार', 'त्योहारी कार्ड'],
-      ogTitle: 'दिवाली ग्रीटिंग कार्ड - रोशनी का त्योहार',
-      ogDescription: 'पारंपरिक डिजाइन और एनीमेशन के साथ सुंदर, व्यक्तिगत दिवाली ग्रीटिंग कार्ड के साथ दिवाली मनाएं।',
-      lang: 'hi',
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "दिवाली ग्रीटिंग कार्ड",
-        "description": "दिवाली के लिए सुंदर ग्रीटिंग कार्ड बनाएं",
-        "url": window.location.origin,
-        "applicationCategory": "त्योहार",
-        "inLanguage": "hi"
-      }
-    }
-  },
-
-  // Christmas
-  christmas: {
-    en: {
-      title: 'Christmas Greeting Cards | Holiday Wishes & Festive Joy',
-      description: 'Create magical Christmas greeting cards with festive animations, holiday music, and warm personalized messages. Spread Christmas joy worldwide.',
-      keywords: ['christmas cards', 'holiday greetings', 'christmas wishes', 'festive cards', 'holiday cards', 'xmas cards'],
-      ogTitle: 'Christmas Greeting Cards - Holiday Magic',
-      ogDescription: 'Spread Christmas joy with beautiful, personalized greeting cards featuring festive animations and music.',
-      lang: 'en',
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Christmas Greeting Cards",
-        "description": "Create beautiful Christmas greeting cards online",
-        "url": window.location.origin,
-        "applicationCategory": "Entertainment",
-        "seasonality": "Christmas"
-      }
-    }
-  },
-
-   'sweet-sixteen': {
-    en: {
-      title: 'Sweet Sixteen Birthday Cards | Celebrate in Style',
-      description: 'Design glamorous Sweet Sixteen birthday cards with animations, music, and heartfelt wishes.',
-      keywords: ['sweet sixteen cards', '16th birthday wishes', 'milestone birthday cards'],
-      ogTitle: 'Sweet Sixteen - Free & Personalized Cards',
-      ogDescription: 'Celebrate Sweet Sixteen with stunning personalized cards featuring music and animations.',
-      lang: 'en',
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "Event",
-        "name": "Sweet Sixteen Celebration",
-        "eventStatus": "https://schema.org/EventScheduled",
-        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
-        "description": "Create and share Sweet Sixteen birthday cards online",
-        "inLanguage": "en",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        }
-      }
-    },
-    hi: {
-      title: 'स्वीट सिक्सटीन जन्मदिन कार्ड | स्टाइल में जश्न मनाएं',
-      description: 'एनिमेशन, म्यूजिक और प्यारे संदेशों के साथ स्वीट सिक्सटीन कार्ड डिज़ाइन करें।',
-      keywords: ['स्वीट सिक्सटीन कार्ड', '16वां जन्मदिन शुभकामनाएं', 'माइलस्टोन जन्मदिन'],
-      ogTitle: 'स्वीट सिक्सटीन - मुफ्त और पर्सनलाइज्ड कार्ड',
-      ogDescription: 'संगीत और एनिमेशन के साथ शानदार स्वीट सिक्सटीन कार्ड बनाएं और भेजें।',
-      lang: 'hi'
-    }
-    // ... other languages
-  },
-
-  'milestone-birthday': {
-    en: {
-      title: 'Milestone Birthday Cards | Celebrate Big Moments',
-      description: 'Send milestone birthday greetings for 18th, 21st, 30th, 50th birthdays and more.',
-      keywords: ['milestone birthday cards', 'big birthday celebrations', 'birthday wishes online'],
-      ogTitle: 'Milestone Birthdays - Celebrate Big Moments',
-      ogDescription: 'Mark life’s milestones with beautiful birthday cards online.',
-      lang: 'en',
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "Event",
-        "name": "Milestone Birthday Celebration",
-        "eventStatus": "https://schema.org/EventScheduled",
-        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
-        "description": "Create and share milestone birthday cards online",
-        "inLanguage": "en",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        }
-      }
-    }
-    // ... translations
-  },
-
-  'holi': {
-    en: {
-      title: 'Holi Cards | Festival of Colors Greetings',
-      description: 'Send colorful animated Holi cards with music and vibrant designs.',
-      keywords: ['holi greetings', 'festival of colors cards', 'happy holi online'],
-      ogTitle: 'Happy Holi - Free & Colorful Cards',
-      ogDescription: 'Celebrate Holi with free animated greeting cards online.',
-      lang: 'en',
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "Festival",
-        "name": "Holi Festival",
-        "eventStatus": "https://schema.org/EventScheduled",
-        "description": "Celebrate Holi with animated greeting cards online",
-        "inLanguage": "en",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        }
-      }
-    }
-    // ... translations
-  },
-  
-  // Eid (Arabic)
-  eid_ar: {
-    ar: {
-      title: 'بطاقات تهنئة العيد | أجمل التهاني والأماني',
-      description: 'أنشئ بطاقات تهنئة العيد الجميلة مع الرسوم المتحركة والموسيقى والرسائل الشخصية. شارك فرحة العيد مع الأحباء.',
-      keywords: ['بطاقات العيد', 'تهاني العيد', 'بطاقات شخصية', 'العيد مبارك'],
-      ogTitle: 'بطاقات تهنئة العيد - جميلة وشخصية',
-      ogDescription: 'أنشئ وشارك بطاقات تهنئة العيد الجميلة مع الرسوم المتحركة والموسيقى والرسائل الشخصية.',
-      lang: 'ar'
-    }
-  }
-};
-
-
-// Comprehensive SEO keywords for greeting cards
-const COMPREHENSIVE_SEO_KEYWORDS = [
-  'free online greeting card',
-  'create beautiful greeting card online for free',
-  'personalized greeting cards',
-  'custom greeting cards maker',
-  'animated greeting cards',
-  'greeting card creator',
-  'online greeting card maker',
-  'make greeting cards online',
-  'digital greeting cards',
-  'e-greeting cards',
-  'virtual greeting cards',
-  'online card maker',
-  'free card maker',
-  'greeting card design',
-  'custom card maker',
-  'personalized cards online',
-  'greeting card template',
-  'online greeting maker',
-  'free greeting card creator',
-  'animated card maker',
-  'greeting card with photo',
-  'birthday card maker',
-  'anniversary card maker',
-  'wedding card maker',
-  'holiday card maker',
-  'christmas card maker',
-  'new year card maker',
-  'valentine card maker',
-  'mother\'s day card',
-  'father\'s day card',
-  'graduation card maker',
-  'thank you card maker',
-  'sorry card maker',
-  'get well soon card',
-  'congratulations card',
-  'invitation card maker',
-  'festival greeting cards',
-  'celebration cards',
-  'special occasion cards',
-  'greeting card with music',
-  'greeting card with animation',
-  'share greeting card online',
-  'send greeting card',
-  'online card design',
-  'beautiful greeting cards',
-  'elegant greeting cards',
-  'modern greeting cards',
-  'creative greeting cards',
-  'unique greeting cards'
-];
-
-export const generateAdvancedSEO = (
-  eventType: string, 
-  lang: string = 'en', 
-  country?: string
-): AdvancedSEOData => {
-  const key = `${eventType}_${lang}`;
-  const countryKey = country ? `${lang}-${country.toUpperCase()}` : lang;
-  
-  // Try to find specific language/country combination first
-  const seoData = languageSEOMap[key]?.[countryKey] || 
-                  languageSEOMap[key]?.[lang] ||
-                  languageSEOMap[eventType]?.[countryKey] ||
-                  languageSEOMap[eventType]?.[lang];
-
-  if (seoData) {
-    // Add comprehensive keywords to existing seoData
-    const enhancedKeywords = [
-      ...seoData.keywords,
-      ...COMPREHENSIVE_SEO_KEYWORDS,
-      `${eventType} greeting card online`,
-      `free ${eventType} card maker`,
-      `${eventType} card with photo`,
-      `personalized ${eventType} greeting`,
-      `${eventType} e-card`,
-      `${eventType} digital card`
-    ];
-
-    return {
-      ...seoData,
-      keywords: [...new Set(enhancedKeywords)], // Remove duplicates
-      canonical: `${window.location.origin}/${lang}/${eventType}`,
-      hrefLang: generateHrefLangAlternates(eventType),
-      robots: 'index, follow, max-image-preview:large'
-    };
-  }
-
-  // Default fallback with comprehensive keywords
-  const defaultKeywords = [
-    `${eventType} cards`,
-    `${eventType} greetings`,
-    'personalized cards',
-    'free greeting cards',
-    ...COMPREHENSIVE_SEO_KEYWORDS
-  ];
-
-  return {
-    title: `Free Online ${eventType.charAt(0).toUpperCase() + eventType.slice(1)} Greeting Cards | Create Beautiful Cards`,
-    description: `Create stunning personalized ${eventType} greeting cards online for free with animations, music, and custom messages. Share beautiful wishes worldwide.`,
-    keywords: [...new Set(defaultKeywords)], // Remove duplicates
-    ogTitle: `Free ${eventType.charAt(0).toUpperCase() + eventType.slice(1)} Greeting Cards - Personalized & Beautiful`,
-    ogDescription: `Create and share stunning ${eventType} greeting cards online for free with custom animations, music, and personalized messages.`,
-    lang: lang,
-    canonical: `${window.location.origin}/${lang}/${eventType}`,
-    robots: 'index, follow, max-image-preview:large'
-  };
-};
-
-const generateHrefLangAlternates = (eventType: string): Record<string, string> => {
-  const baseUrl = window.location.origin;
-  return {
-    'en': `${baseUrl}/en/${eventType}`,
-    'hi': `${baseUrl}/hi/${eventType}`,
-    'es': `${baseUrl}/es/${eventType}`,
-    'fr': `${baseUrl}/fr/${eventType}`,
-    'de': `${baseUrl}/de/${eventType}`,
-    'ar': `${baseUrl}/ar/${eventType}`,
-    'x-default': `${baseUrl}/${eventType}`
-  };
-};
-
-export const updateAdvancedPageSEO = (seoData: AdvancedSEOData) => {
-  // Update document title
-  document.title = seoData.title;
+/**
+ * Update page SEO with advanced settings
+ */
+export const updateAdvancedPageSEO = (data: AdvancedSEOData): void => {
+  // Update title
+  document.title = data.title;
 
   // Update or create meta tags
-  const updateMeta = (property: string, content: string, isProperty = false) => {
-    const selector = isProperty ? `meta[property="${property}"]` : `meta[name="${property}"]`;
-    let meta = document.querySelector(selector);
+  const updateMetaTag = (name: string, content: string, isProperty = false) => {
+    const attribute = isProperty ? 'property' : 'name';
+    let meta = document.querySelector(`meta[${attribute}="${name}"]`);
     
     if (!meta) {
       meta = document.createElement('meta');
-      if (isProperty) {
-        meta.setAttribute('property', property);
-      } else {
-        meta.setAttribute('name', property);
-      }
+      meta.setAttribute(attribute, name);
       document.head.appendChild(meta);
     }
-    
     meta.setAttribute('content', content);
   };
 
   // Basic meta tags
-  updateMeta('description', seoData.description);
-  updateMeta('keywords', seoData.keywords.join(', '));
-  updateMeta('robots', seoData.robots || 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
-  updateMeta('viewport', 'width=device-width, initial-scale=1');
-  updateMeta('author', 'Greeting Cards Creator');
+  updateMetaTag('description', data.description);
+  updateMetaTag('keywords', data.keywords.join(', '));
   
-  // Google-specific meta tags for better indexing
-  updateMeta('googlebot', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
-  updateMeta('bingbot', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
-  
-  // Google Discover optimization
-  updateMeta('google', 'notranslate');
-  updateMeta('rating', 'general');
-  updateMeta('referrer', 'no-referrer-when-downgrade');
-  
-  // Content classification
-  updateMeta('content-language', seoData.lang);
-  updateMeta('distribution', 'global');
-  updateMeta('coverage', 'Worldwide');
-  updateMeta('target', 'all');
-
-  // Enhanced Open Graph tags
-  updateMeta('og:type', seoData.ogType || 'article', true);
-  updateMeta('og:title', seoData.ogTitle, true);
-  updateMeta('og:description', seoData.ogDescription, true);
-  updateMeta('og:url', window.location.href, true);
-  updateMeta('og:site_name', 'Beautiful Greeting Cards', true);
-  updateMeta('og:locale', seoData.lang, true);
-  updateMeta('og:updated_time', new Date().toISOString(), true);
-  updateMeta('og:see_also', window.location.origin, true);
-  
-  // Add alternate locales for multi-language support
-  if (seoData.hrefLang) {
-    Object.keys(seoData.hrefLang).forEach(lang => {
-      if (lang !== 'x-default' && lang !== seoData.lang) {
-        const alternateLang = lang.replace('-', '_');
-        updateMeta(`og:locale:alternate`, alternateLang, true);
-      }
-    });
-  }
-  
-  if (seoData.ogImage) {
-    updateMeta('og:image', seoData.ogImage, true);
-    updateMeta('og:image:secure_url', seoData.ogImage, true);
-    updateMeta('og:image:alt', seoData.ogImageAlt || seoData.ogTitle, true);
-    updateMeta('og:image:width', '1200', true);
-    updateMeta('og:image:height', '630', true);
-    updateMeta('og:image:type', 'image/jpeg', true);
-  }
-  
-  // Article-specific OG tags for Google Discover
-  if (seoData.ogType === 'article') {
-    updateMeta('article:published_time', new Date().toISOString(), true);
-    updateMeta('article:modified_time', new Date().toISOString(), true);
-    updateMeta('article:author', 'Beautiful Greeting Cards', true);
-    updateMeta('article:section', 'Greetings', true);
-    updateMeta('article:tag', seoData.keywords.slice(0, 5).join(', '), true);
+  if (data.robots) {
+    updateMetaTag('robots', data.robots);
   }
 
-  // Enhanced Twitter Card tags
-  updateMeta('twitter:card', seoData.twitterCard || 'summary_large_image');
-  updateMeta('twitter:title', seoData.ogTitle);
-  updateMeta('twitter:description', seoData.ogDescription);
-  updateMeta('twitter:site', '@greetingcards');
-  updateMeta('twitter:creator', '@greetingcards');
-  const twitterImageSrc = seoData.twitterImage || seoData.ogImage;
-  if (twitterImageSrc) {
-    updateMeta('twitter:image', twitterImageSrc);
-    updateMeta('twitter:image:src', twitterImageSrc);
-    updateMeta('twitter:image:alt', seoData.ogImageAlt || seoData.ogTitle);
-  }
-  
-  // Additional Twitter-specific tags
-  updateMeta('twitter:domain', window.location.hostname);
-  updateMeta('twitter:url', window.location.href);
+  // Open Graph tags
+  if (data.ogTitle) updateMetaTag('og:title', data.ogTitle, true);
+  if (data.ogDescription) updateMetaTag('og:description', data.ogDescription, true);
+  if (data.ogImage) updateMetaTag('og:image', data.ogImage, true);
+  if (data.ogImageAlt) updateMetaTag('og:image:alt', data.ogImageAlt, true);
+  if (data.ogType) updateMetaTag('og:type', data.ogType, true);
 
-  // Language and direction
-  document.documentElement.lang = seoData.lang;
-  if (seoData.lang === 'ar' || seoData.lang === 'he') {
-    document.documentElement.dir = 'rtl';
-  } else {
-    document.documentElement.dir = 'ltr';
-  }
+  // Twitter Card tags
+  if (data.twitterCard) updateMetaTag('twitter:card', data.twitterCard);
+  if (data.twitterImage) updateMetaTag('twitter:image', data.twitterImage);
 
   // Canonical URL
-  if (seoData.canonical) {
-    let canonical = document.querySelector('link[rel="canonical"]');
+  if (data.canonical) {
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
     if (!canonical) {
       canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
+      canonical.rel = 'canonical';
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', seoData.canonical);
+    canonical.href = data.canonical;
   }
 
-  // Hreflang alternates
-  if (seoData.hrefLang) {
-    // Remove existing hreflang tags
-    document.querySelectorAll('link[rel="alternate"]').forEach(link => link.remove());
-    
-    Object.entries(seoData.hrefLang).forEach(([lang, url]) => {
-      const link = document.createElement('link');
-      link.setAttribute('rel', 'alternate');
-      link.setAttribute('hreflang', lang);
-      link.setAttribute('href', url);
-      document.head.appendChild(link);
+  // Language
+  if (data.lang) {
+    document.documentElement.lang = data.lang;
+  }
+
+  // Structured data
+  if (data.structuredData) {
+    let script = document.querySelector('script[type="application/ld+json"]') as HTMLScriptElement;
+    if (!script) {
+      script = document.createElement('script');
+      script.type = 'application/ld+json';
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(data.structuredData);
+  }
+
+  // HrefLang tags
+  if (data.hrefLang) {
+    Object.entries(data.hrefLang).forEach(([lang, url]) => {
+      let link = document.querySelector(`link[hreflang="${lang}"]`) as HTMLLinkElement;
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'alternate';
+        link.hreflang = lang;
+        document.head.appendChild(link);
+      }
+      link.href = url;
     });
   }
+};
 
-  // Structured Data
-  if (seoData.structuredData) {
-    let structuredDataScript = document.querySelector('script[type="application/ld+json"]') as HTMLScriptElement;
-    if (!structuredDataScript) {
-      structuredDataScript = document.createElement('script');
-      structuredDataScript.type = 'application/ld+json';
-      document.head.appendChild(structuredDataScript);
-    }
-    structuredDataScript.textContent = JSON.stringify(seoData.structuredData);
-  }
-
-  // Additional mobile optimization
-  updateMeta('format-detection', 'telephone=no');
-  updateMeta('mobile-web-app-capable', 'yes');
-  updateMeta('apple-mobile-web-app-capable', 'yes');
-  updateMeta('apple-mobile-web-app-status-bar-style', 'default');
-  updateMeta('apple-mobile-web-app-title', seoData.title);
+/**
+ * Generate advanced SEO data for different event types
+ */
+export const generateAdvancedSEO = (eventType: string, languageCode: string = 'en'): AdvancedSEOData => {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
   
-  // PWA optimization
-  updateMeta('application-name', 'Beautiful Greeting Cards');
-  updateMeta('theme-color', '#ffffff');
-  updateMeta('msapplication-TileColor', '#ffffff');
-  
-  // Preconnect to improve performance
-  const addPreconnect = (href: string) => {
-    if (!document.querySelector(`link[rel="preconnect"][href="${href}"]`)) {
-      const link = document.createElement('link');
-      link.rel = 'preconnect';
-      link.href = href;
-      document.head.appendChild(link);
-    }
+  const eventTitles: Record<string, string> = {
+    birthday: 'Birthday Greeting Card',
+    anniversary: 'Anniversary Greeting Card',
+    wedding: 'Wedding Greeting Card',
+    graduation: 'Graduation Greeting Card',
+    'thank-you': 'Thank You Card',
+    congratulations: 'Congratulations Card',
+    'get-well-soon': 'Get Well Soon Card',
+    sympathy: 'Sympathy Card',
+    'new-baby': 'New Baby Card',
+    retirement: 'Retirement Card',
   };
+
+  const title = eventTitles[eventType] || 'Beautiful Greeting Card';
+  const description = `Create a personalized ${title.toLowerCase()} online. Add photos, custom messages, and beautiful designs to make it truly special.`;
+
+  return {
+    title: `${title} | Beautiful Greeting Cards`,
+    description,
+    keywords: [
+      eventType,
+      `${eventType} card`,
+      `${eventType} greeting`,
+      `${eventType} wishes`,
+      'greeting card',
+      'personalized card',
+      'custom greeting',
+      'online card maker',
+      'free greeting card',
+    ],
+    ogTitle: title,
+    ogDescription: description,
+    ogImage: `${baseUrl}/icon-512.png`,
+    ogType: 'website',
+    twitterCard: 'summary_large_image',
+    canonical: typeof window !== 'undefined' ? window.location.href : baseUrl,
+    lang: languageCode,
+    robots: 'index, follow',
+  };
+};
+
+/**
+ * Generate JSON-LD structured data
+ */
+export const generateStructuredData = (config: StructuredDataConfig): string => {
+  const baseData = {
+    '@context': 'https://schema.org',
+    '@type': config.type,
+    ...config.data,
+  };
+
+  return JSON.stringify(baseData, null, 2);
+};
+
+/**
+ * Generate breadcrumb structured data
+ */
+export const generateBreadcrumbSchema = (items: { name: string; url: string }[]): string => {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  });
+};
+
+/**
+ * Generate FAQ structured data
+ */
+export const generateFAQSchema = (faqs: { question: string; answer: string }[]): string => {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(faq => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  });
+};
+
+/**
+ * Generate Organization structured data
+ */
+export const generateOrganizationSchema = (): string => {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
   
-  addPreconnect('https://fonts.googleapis.com');
-  addPreconnect('https://fonts.gstatic.com');
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Beautiful Greeting Cards',
+    url: baseUrl,
+    logo: `${baseUrl}/icon-512.png`,
+    sameAs: [
+      // Add social media profiles here when available
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'Customer Service',
+      availableLanguage: ['English'],
+    },
+  });
+};
+
+/**
+ * Generate Event structured data for calendar integrations
+ */
+export const generateEventSchema = (event: {
+  name: string;
+  date: string;
+  description?: string;
+  location?: string;
+}): string => {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: event.name,
+    startDate: event.date,
+    description: event.description || '',
+    location: event.location ? {
+      '@type': 'Place',
+      name: event.location,
+    } : undefined,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+  });
+};
+
+/**
+ * Generate CreativeWork schema for greeting cards
+ */
+export const generateGreetingCardSchema = (greeting: {
+  title: string;
+  description: string;
+  creator: string;
+  recipient: string;
+  eventType: string;
+  mediaUrl?: string;
+  dateCreated?: string;
+}): string => {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: greeting.title,
+    description: greeting.description,
+    creator: {
+      '@type': 'Person',
+      name: greeting.creator,
+    },
+    about: {
+      '@type': 'Event',
+      name: greeting.eventType,
+    },
+    image: greeting.mediaUrl,
+    dateCreated: greeting.dateCreated || new Date().toISOString(),
+    inLanguage: 'en',
+    isAccessibleForFree: true,
+    url: baseUrl,
+  });
+};
+
+/**
+ * Meta tags generator for social sharing
+ */
+export const generateMetaTags = (config: {
+  title: string;
+  description: string;
+  image?: string;
+  url?: string;
+  type?: 'website' | 'article';
+  keywords?: string[];
+}): Record<string, string> => {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const defaultImage = `${baseUrl}/icon-512.png`;
+
+  return {
+    // Basic Meta
+    'title': config.title,
+    'description': config.description,
+    'keywords': config.keywords?.join(', ') || '',
+    
+    // Open Graph
+    'og:title': config.title,
+    'og:description': config.description,
+    'og:image': config.image || defaultImage,
+    'og:url': config.url || baseUrl,
+    'og:type': config.type || 'website',
+    'og:site_name': 'Beautiful Greeting Cards',
+    
+    // Twitter Card
+    'twitter:card': 'summary_large_image',
+    'twitter:title': config.title,
+    'twitter:description': config.description,
+    'twitter:image': config.image || defaultImage,
+    
+    // Additional
+    'theme-color': '#9b87f5',
+  };
+};
+
+/**
+ * Generate canonical URL
+ */
+export const generateCanonicalURL = (path: string): string => {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  return `${baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
+};
+
+/**
+ * Generate alternate language links (hrefLang)
+ */
+export const generateHrefLangTags = (languages: string[]): Record<string, string> => {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+  
+  const tags: Record<string, string> = {};
+  languages.forEach(lang => {
+    tags[`alternate-${lang}`] = `${baseUrl}${currentPath}?lang=${lang}`;
+  });
+  
+  return tags;
 };

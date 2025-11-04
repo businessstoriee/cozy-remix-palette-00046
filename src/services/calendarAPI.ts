@@ -13,9 +13,41 @@ export interface CalendarEvent {
   description?: string;
 }
 
-// Cache for API responses
-const cache = new Map<string, { data: CalendarEvent[], timestamp: number }>();
+// Enhanced cache with localStorage persistence
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_KEY_PREFIX = 'calendar_cache_';
+
+// Initialize cache from localStorage
+const initializeCache = (): Map<string, { data: CalendarEvent[], timestamp: number }> => {
+  const cache = new Map();
+  try {
+    const keys = Object.keys(localStorage).filter(key => key.startsWith(CACHE_KEY_PREFIX));
+    keys.forEach(key => {
+      const data = localStorage.getItem(key);
+      if (data) {
+        const parsed = JSON.parse(data);
+        cache.set(key.replace(CACHE_KEY_PREFIX, ''), parsed);
+      }
+    });
+  } catch (e) {
+    console.warn('Failed to load cache from localStorage:', e);
+  }
+  return cache;
+};
+
+const cache = initializeCache();
+
+// Save cache to localStorage
+const saveCacheToStorage = (key: string, data: CalendarEvent[], timestamp: number) => {
+  try {
+    localStorage.setItem(
+      `${CACHE_KEY_PREFIX}${key}`,
+      JSON.stringify({ data, timestamp })
+    );
+  } catch (e) {
+    console.warn('Failed to save cache to localStorage:', e);
+  }
+};
 
 /**
  * Fetch holidays from Nager.Date API (free, no key required)
@@ -53,7 +85,9 @@ export async function fetchPublicHolidays(
       description: holiday.name,
     }));
 
-    cache.set(cacheKey, { data: events, timestamp: Date.now() });
+    const timestamp = Date.now();
+    cache.set(cacheKey, { data: events, timestamp });
+    saveCacheToStorage(cacheKey, events, timestamp);
     return events;
   } catch (error) {
     console.error('Error fetching public holidays:', error);
