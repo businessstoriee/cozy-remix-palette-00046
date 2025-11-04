@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { EventType, TextContent, EventEmojiSettings } from '@/types/greeting';
 import { eventTypes } from '@/types/eventTypes';
-import { Plus, Calendar, Edit, Search, X } from 'lucide-react';
+import { Plus, Calendar, Edit, Search, X, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EventNameCustomizer from './EventNameCustomizer';
 import EventEmojiCustomizer from '../eventName/EventEmojiCustomizer';
+import { getAllEvents, formatEventDate, type CalendarEvent } from '@/services/calendarAPI';
+import { Badge } from '@/components/ui/badge';
 
 interface CustomEventSelectorProps {
   selectedEvent: string;
@@ -37,6 +39,25 @@ const CustomEventSelector = ({
   const [showEventCustomizer, setShowEventCustomizer] = useState(false);
   const [showEmojiCustomizer, setShowEmojiCustomizer] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(false);
+
+  // Fetch calendar events on mount
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoadingEvents(true);
+      try {
+        const events = await getAllEvents();
+        setCalendarEvents(events);
+      } catch (error) {
+        console.error('Failed to fetch calendar events:', error);
+      } finally {
+        setLoadingEvents(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   // keep only one open
   const toggleEventCustomizer = () => {
@@ -65,17 +86,34 @@ const CustomEventSelector = ({
 
   const allEvents = customEvent ? [...eventTypes, customEvent] : eventTypes;
   
+  // Convert calendar events to EventType format and merge with existing events
+  const calendarEventTypes: EventType[] = useMemo(() => 
+    calendarEvents.map((event) => ({
+      value: event.id,
+      label: event.name,
+      emoji: event.emoji,
+      defaultMessage: event.description || `Celebrating ${event.name}!`,
+      theme: 'card-custom' as const,
+      category: event.category,
+      isCalendarEvent: true,
+      eventDate: event.date,
+    })),
+    [calendarEvents]
+  );
+
+  const allEventsWithCalendar = [...allEvents, ...calendarEventTypes];
+  
   // Filter events based on search query
   const filteredEvents = useMemo(() => {
-    if (!searchQuery.trim()) return allEvents;
+    if (!searchQuery.trim()) return allEventsWithCalendar;
     
     const query = searchQuery.toLowerCase();
-    return allEvents.filter(event => 
+    return allEventsWithCalendar.filter(event => 
       event.label.toLowerCase().includes(query) ||
       event.emoji.includes(query) ||
       event.category?.toLowerCase().includes(query)
     );
-  }, [allEvents, searchQuery]);
+  }, [allEventsWithCalendar, searchQuery]);
 
   const groupedEvents = filteredEvents.reduce((acc, event) => {
     if (!acc[event.category]) acc[event.category] = [];
@@ -83,7 +121,7 @@ const CustomEventSelector = ({
     return acc;
   }, {} as Record<string, EventType[]>);
 
-  const categoryLabels = {
+  const categoryLabels: Record<string, string> = {
     birthday: '🎂 Birthday Events',
     religious: '🙏 Religious Festivals',
     national: '🏛️ National Holidays',
@@ -217,29 +255,52 @@ const CustomEventSelector = ({
                 )}
               </div>
 
+              {/* Loading State */}
+              {loadingEvents && (
+                <div className="px-4 py-8 text-center text-muted-foreground">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="inline-block"
+                  >
+                    <Sparkles className="h-6 w-6 text-primary" />
+                  </motion.div>
+                  <p className="text-sm mt-2">Loading upcoming events...</p>
+                </div>
+              )}
+
               {/* Event Options */}
-              {Object.entries(groupedEvents).length > 0 ? (
+              {!loadingEvents && Object.entries(groupedEvents).length > 0 ? (
                 Object.entries(groupedEvents).map(([category, events]) => (
                   <div key={category}>
                     <div className="px-2 py-1 text-xs font-semibold text-muted-foreground border-b border-muted/50 bg-muted/20">
-                      {categoryLabels[category as keyof typeof categoryLabels]}
+                      {categoryLabels[category] || `${category.charAt(0).toUpperCase() + category.slice(1)} Events`}
                     </div>
-                    {events.map((event) => (
+                    {events.map((event: any) => (
                       <SelectItem key={event.value} value={event.value} className="hover:bg-primary/10 dark:hover:bg-primary/20">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{event.emoji}</span>
-                          <span>{event.label}</span>
+                        <div className="flex items-center justify-between w-full gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{event.emoji}</span>
+                            <span>{event.label}</span>
+                          </div>
+                          {event.isCalendarEvent && event.eventDate && (
+                            <Badge variant="secondary" className="text-[10px] ml-auto">
+                              {formatEventDate(event.eventDate)}
+                            </Badge>
+                          )}
                         </div>
                       </SelectItem>
                     ))}
                   </div>
                 ))
               ) : (
-                <div className="px-4 py-8 text-center text-muted-foreground">
-                  <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No events found</p>
-                  <p className="text-xs mt-1">Try a different search term</p>
-                </div>
+                !loadingEvents && (
+                  <div className="px-4 py-8 text-center text-muted-foreground">
+                    <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No events found</p>
+                    <p className="text-xs mt-1">Try a different search term</p>
+                  </div>
+                )
               )}
             </SelectContent>
           </Select>

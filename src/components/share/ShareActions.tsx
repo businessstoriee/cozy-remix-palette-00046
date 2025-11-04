@@ -137,26 +137,30 @@ const ShareActions = ({ greetingData, selectedEvent, onlyShareButton, dialogOpen
     const catchyMessage = generateShareMessage(eventType, shareableURL);
     const plainText = catchyMessage.replace(/\*\*/g, '').replace(/\*/g, '');
     
-    // Get first media URL for rich sharing
+    // Get first media URL for rich sharing (image will be fetched from OG tags)
     const mediaUrl = currentGreetingData?.media?.[0]?.url || '';
     
     let shareURL = '';
 
     switch (platform) {
       case 'whatsapp': 
+        // WhatsApp fetches OG image from URL
         shareURL = `https://wa.me/?text=${encodeURIComponent(catchyMessage)}`; 
         break;
       case 'facebook': 
-        // Facebook scrapes OG tags from the URL
+        // Facebook scrapes OG tags from the URL (includes og:image)
         shareURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareableURL)}`; 
         break;
       case 'twitter': 
-        shareURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(plainText)}`; 
+        // Twitter uses twitter:image from meta tags
+        shareURL = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareableURL)}&text=${encodeURIComponent(plainText)}`; 
         break;
       case 'telegram': 
+        // Telegram fetches OG image from URL
         shareURL = `https://t.me/share/url?url=${encodeURIComponent(shareableURL)}&text=${encodeURIComponent(catchyMessage)}`; 
         break;
       case 'linkedin': 
+        // LinkedIn scrapes OG tags from the URL
         shareURL = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareableURL)}`; 
         break;
     }

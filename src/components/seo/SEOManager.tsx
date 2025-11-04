@@ -60,24 +60,20 @@ const SEOManager = ({
     seoData.ogType = 'article';
     seoData.twitterCard = 'summary_large_image';
     
-    // Use first image from media for social preview (CRITICAL for WhatsApp, Facebook, Twitter)
-    // Alt tag: event name and first text message
-    if (firstImage) {
-      seoData.ogImage = firstImage;
-      seoData.twitterImage = firstImage;
-      const altText = `${eventDisplay} greeting${firstText ? `: ${firstText.substring(0, 100)}${firstText.length > 100 ? '...' : ''}` : ''}`;
-      seoData.ogImageAlt = altText;
-    }
-    
     // Enhanced structured data for Google, Google Discover, and Google News
     const currentUrl = window.location.href;
     const mediaItems = greetingData?.media || [];
     const allImages = mediaItems.filter(m => m.type === 'image').map(m => m.url);
     
-    // Generate dynamic OG image URL (use first image or create a default)
-    const dynamicOGImage = firstImage || `${window.location.origin}/og-default.png`;
+    // Use first image from media for social preview (CRITICAL for WhatsApp, Facebook, Twitter)
+    const dynamicOGImage = firstImage || `${window.location.origin}/icon-512.png`;
     seoData.ogImage = dynamicOGImage;
     seoData.twitterImage = dynamicOGImage;
+    
+    if (firstImage) {
+      const altText = `${eventDisplay} greeting${firstText ? `: ${firstText.substring(0, 100)}${firstText.length > 100 ? '...' : ''}` : ''}`;
+      seoData.ogImageAlt = altText;
+    }
     
     seoData.structuredData = {
       "@context": "https://schema.org",

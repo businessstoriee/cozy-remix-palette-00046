@@ -9,6 +9,8 @@ export interface EventType {
   theme?: string;
   backgroundImage?: string;
   category?: 'birthday' | 'religious' | 'national' | 'seasonal' | 'personal' | 'special' | 'wellness' | 'professional' | 'international' | 'custom';
+  isCalendarEvent?: boolean;
+  eventDate?: string;
 }
 
 export interface TextContent {

@@ -1,5 +1,5 @@
 // src/ErrorBoundary.tsx
-import { Component, ReactNode, MouseEvent, useRef } from "react";
+import { Component, ReactNode, MouseEvent, useRef, useMemo } from "react";
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { Link } from "react-router-dom";
 
@@ -45,6 +45,22 @@ const ErrorUI = ({ error }: { error?: Error }) => {
     x.set(0.5);
     y.set(0.5);
   };
+
+  // Generate particles data once with useMemo to prevent re-renders
+  const particlesData = useMemo(() => 
+    Array.from({ length: 15 }, (_, i) => ({
+      id: i,
+      width: Math.random() * 10 + 6,
+      height: Math.random() * 10 + 6,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      y: Math.random() * 40,
+      x: Math.random() * 30 - 15,
+      duration: Math.random() * 10 + 10,
+      delay: Math.random() * 5,
+    })),
+    []
+  );
 
   return (
     <motion.div
@@ -186,26 +202,26 @@ const ErrorUI = ({ error }: { error?: Error }) => {
 
       {/* Floating particles background - Single container for all particles */}
       <div className="fixed inset-0 -z-40 overflow-hidden pointer-events-none">
-        {[...Array(15)].map((_, i) => (
+        {particlesData.map((particle) => (
           <motion.div
-            key={`particle-${i}`}
+            key={`particle-${particle.id}`}
             className="absolute rounded-full bg-purple-500/30 dark:bg-fuchsia-400/30"
             style={{
-              width: `${Math.random() * 10 + 6}px`,
-              height: `${Math.random() * 10 + 6}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              width: `${particle.width}px`,
+              height: `${particle.height}px`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
             }}
             animate={{
-              y: [0, -40, 0],
-              x: [0, Math.random() * 30 - 15, 0],
+              y: [0, -particle.y, 0],
+              x: [0, particle.x, 0],
               opacity: [0.2, 0.8, 0.2],
             }}
             transition={{
-              duration: Math.random() * 10 + 10,
+              duration: particle.duration,
               repeat: Infinity,
               repeatType: "reverse",
-              delay: Math.random() * 5,
+              delay: particle.delay,
             }}
           />
         ))}
