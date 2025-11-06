@@ -66,7 +66,16 @@ const SEOManager = ({
     const allImages = mediaItems.filter(m => m.type === 'image').map(m => m.url);
     
     // Use first image from media for social preview (CRITICAL for WhatsApp, Facebook, Twitter)
-    const dynamicOGImage = firstImage || `${window.location.origin}/icon-512.png`;
+    // Ensure absolute URLs for proper social media previews
+    const getAbsoluteUrl = (url: string | undefined) => {
+      if (!url) return `${window.location.origin}/icon-512.png`;
+      if (url.startsWith('http://') || url.startsWith('https://')) return url;
+      if (url.startsWith('//')) return `https:${url}`;
+      if (url.startsWith('/')) return `${window.location.origin}${url}`;
+      return `${window.location.origin}/${url}`;
+    };
+    
+    const dynamicOGImage = getAbsoluteUrl(firstImage);
     seoData.ogImage = dynamicOGImage;
     seoData.twitterImage = dynamicOGImage;
     

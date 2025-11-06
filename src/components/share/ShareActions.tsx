@@ -17,7 +17,7 @@ import {
   Edit2,
 } from 'lucide-react';
 import { useLanguageTranslation } from '@/components/language/useLanguageTranslation';
-import { generateShareMessage } from '@/utils/shareTexts';
+import { generateShareMessage, getRandomShareText } from '@/utils/shareTexts';
 import type { EventType } from '@/types/greeting';
 import ViewGreeting from '@/pages/ViewGreeting'
 
