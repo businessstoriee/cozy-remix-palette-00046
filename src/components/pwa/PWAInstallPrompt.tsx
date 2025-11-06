@@ -133,17 +133,24 @@ export default function PWAInstallPrompt({
   useEffect(() => {
     if (typeof window === "undefined") return;
     const handler = (e: Event) => {
+      console.log('🎯 beforeinstallprompt event received');
       try {
         e.preventDefault();
-      } catch {}
+        console.log('✅ Default prevented on beforeinstallprompt');
+      } catch (err) {
+        console.error('❌ Failed to prevent default:', err);
+      }
       // store event
       setDeferredPrompt(e as BeforeInstallPromptEventLike);
+      console.log('💾 Deferred prompt stored');
       track("pwa:beforeinstallprompt_received");
       // schedule show using intelligent rules
       scheduleShow();
     };
 
     window.addEventListener("beforeinstallprompt", handler);
+    console.log('👂 Listening for beforeinstallprompt event');
+    
     return () => {
       window.removeEventListener("beforeinstallprompt", handler);
       if (timerRef.current) {
@@ -309,21 +316,36 @@ export default function PWAInstallPrompt({
     // Android/chrome pathway
     if (deferredPrompt) {
       try {
-        await deferredPrompt.prompt();
+        console.log('🚀 Triggering PWA install prompt...');
+        
+        // Call prompt() - this must be called in response to a user gesture
+        const promptResult = await deferredPrompt.prompt();
+        console.log('📱 Prompt shown, result:', promptResult);
+        
+        // Wait for the user's choice
         const choice = await deferredPrompt.userChoice;
+        console.log('✅ User choice:', choice);
+        
         if (choice?.outcome === "accepted") {
+          console.log('🎉 User accepted PWA installation');
           track("pwa:installed", { method: "browser-prompt" });
         } else {
+          console.log('❌ User dismissed PWA installation');
           track("pwa:install_dismissed", { method: "browser-prompt" });
         }
       } catch (err) {
+        console.error('❌ PWA install error:', err);
         track("pwa:install_error", { error: String(err) });
+        
+        // If there's an error, try to provide helpful feedback
+        alert('Installation failed. Please try:\n1. Checking if the app is already installed\n2. Using Chrome or Edge browser\n3. Visiting via HTTPS');
       } finally {
         setVisible(false);
         setLocal("pwa-prompt-lastShown", String(Date.now()));
         setDeferredPrompt(null);
       }
     } else {
+      console.warn('⚠️ No deferred prompt available');
       // For other cases, just close. (iOS uses instructive flow)
       setVisible(false);
       setLocal("pwa-prompt-lastShown", String(Date.now()));
